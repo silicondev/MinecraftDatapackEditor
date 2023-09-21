@@ -56,7 +56,11 @@ namespace MinecraftDatapackEditor
                     Datapack = DataPack.CreateNew(DatapackDirectory);
             }
             else
+            {
                 Datapack = new DataPack(DatapackDirectory);
+                Datapack.Load();
+            }
+                
 
             ValidDatapack = Datapack != null && !string.IsNullOrEmpty(Datapack.Name) && Datapack.Pack != null;
         }
