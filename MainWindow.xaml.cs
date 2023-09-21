@@ -60,9 +60,42 @@ namespace MinecraftDatapackEditor
                 Datapack = new DataPack(DatapackDirectory);
                 Datapack.Load();
             }
-                
 
             ValidDatapack = Datapack != null && !string.IsNullOrEmpty(Datapack.Name) && Datapack.Pack != null;
+            RefreshView();
+        }
+
+        private void RefreshView()
+        {
+            if (!ValidDatapack)
+                return;
+
+            foreach (var ns in Datapack.Namespaces)
+            {
+                var tvNs = new TreeViewItem()
+                {
+                    Header = ns.Name
+                };
+
+                var tvDimH = new TreeViewItem()
+                {
+                    Header = "Dimensions"
+                };
+
+                foreach (var dim in ns.Dimensions)
+                {
+                    var tvDim = new TreeViewItem()
+                    {
+                        Header = dim.Name
+                    };
+
+                    tvDimH.Items.Add(tvDim);
+                }
+
+                tvNs.Items.Add(tvDimH);
+
+                FileExplorerView.Items.Add(tvNs);
+            }
         }
     }
 }

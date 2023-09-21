@@ -133,7 +133,7 @@ namespace MinecraftDatapackEditor.Data
                         using (var stream = File.OpenRead(dimensionPath))
                         using (var reader = new StreamReader(stream))
                             dim = JsonConvert.DeserializeObject<Dimension>(reader.ReadToEnd());
-                        
+                        dim.Name = Path.GetFileNameWithoutExtension(dimensionPath);
                     }
                     catch (Exception)
                     {
