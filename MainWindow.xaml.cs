@@ -95,6 +95,7 @@ namespace MinecraftDatapackEditor
                 tvNs.Items.Add(tvDimH);
 
                 FileExplorerView.Items.Add(tvNs);
+
             }
         }
     }
