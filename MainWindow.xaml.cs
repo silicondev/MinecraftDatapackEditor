@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using MinecraftDatapackEditor.Data;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +14,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace MinecraftDatapackEditor
 {
@@ -20,9 +22,43 @@ namespace MinecraftDatapackEditor
     /// </summary>
     public partial class MainWindow : Window
     {
+        public string DatapackDirectory
+        {
+            get => DatapackFolderTxt.Text ?? "";
+            set => DatapackFolderTxt.Text = value;
+        }
+        public bool ValidDatapack { get; private set; }
+
+        public DataPack? Datapack { get; private set; } = null;
+
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void DatapackFolderSelectBtn_Click(object sender, RoutedEventArgs e)
+        {
+            using (var fd = new CommonOpenFileDialog())
+            {
+                fd.IsFolderPicker = true;
+                fd.InitialDirectory = "C:\\";
+                if (fd.ShowDialog() == CommonFileDialogResult.Ok)
+                    DatapackDirectory = fd.FileName;
+            }
+        }
+
+        private void LoadBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Datapack = null;
+            if (!File.Exists(Path.Combine(DatapackDirectory, "pack.mcmeta")))
+            {
+                if (MessageBox.Show("No Datapack at your selected folder exists! Would you like to create one?", "Create New?", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    Datapack = DataPack.CreateNew(DatapackDirectory);
+            }
+            else
+                Datapack = new DataPack(DatapackDirectory);
+
+            ValidDatapack = Datapack != null && !string.IsNullOrEmpty(Datapack.Name) && Datapack.Pack != null;
         }
     }
 }
