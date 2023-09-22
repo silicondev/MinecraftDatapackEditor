@@ -47,8 +47,9 @@ namespace MinecraftDatapackEditor
             }
         }
 
-        private void LoadBtn_Click(object sender, RoutedEventArgs e)
+        private async void LoadBtn_Click(object sender, RoutedEventArgs e)
         {
+            LoadBtn.Content = "Loading...";
             Datapack = null;
             if (!File.Exists(Path.Combine(DatapackDirectory, "pack.mcmeta")))
             {
@@ -63,6 +64,7 @@ namespace MinecraftDatapackEditor
 
             ValidDatapack = Datapack != null && !string.IsNullOrEmpty(Datapack.Name) && Datapack.Pack != null;
             RefreshView();
+            LoadBtn.Content = "LOAD";
         }
 
         private void RefreshView()
@@ -72,31 +74,19 @@ namespace MinecraftDatapackEditor
 
             foreach (var ns in Datapack.Namespaces)
             {
-                var tvNs = new TreeViewItem()
-                {
-                    Header = ns.Name
-                };
-
-                var tvDimH = new TreeViewItem()
-                {
-                    Header = "Dimensions"
-                };
-
-                foreach (var dim in ns.Dimensions)
-                {
-                    var tvDim = new TreeViewItem()
-                    {
-                        Header = dim.Name
-                    };
-
-                    tvDimH.Items.Add(tvDim);
-                }
-
-                tvNs.Items.Add(tvDimH);
-
-                FileExplorerView.Items.Add(tvNs);
-
+                FileExplorerView.Render(ns);
             }
+        }
+
+        private void FileExplorerView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            try
+            {
+                var tvi = (TreeViewItem)e.NewValue;
+
+                ValueTxt.Text = tvi.Tag.ToString();
+            }
+            catch (Exception) { }
         }
     }
 }

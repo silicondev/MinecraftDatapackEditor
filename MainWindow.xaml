@@ -53,12 +53,12 @@
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <Border BorderBrush="Black">
-                    <TreeView x:Name="FileExplorerView"/>
+                    <TreeView x:Name="FileExplorerView" SelectedItemChanged="FileExplorerView_SelectedItemChanged"/>
                 </Border>
             </Grid>
             <Grid Grid.Column="1">
                 <Border BorderBrush="Black">
-
+                    <TextBlock x:Name="ValueTxt"/>
                 </Border>
             </Grid>
         </Grid>
