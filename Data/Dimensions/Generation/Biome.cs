@@ -19,6 +19,8 @@ namespace MinecraftDatapackEditor.Data.Dimensions.Generation
 
         [JsonIgnore]
         public string Title => Id;
+        [JsonIgnore]
+        public Type OriginType => typeof(Biome);
 
         public string GetDistinct() => Id;
     }

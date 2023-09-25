@@ -1,5 +1,7 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using MinecraftDatapackEditor.Data;
+using MinecraftDatapackEditor.Data.Dimensions.Generation;
+using MinecraftDatapackEditor.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -72,6 +74,8 @@ namespace MinecraftDatapackEditor
             if (!ValidDatapack)
                 return;
 
+            FileExplorerView.Items.Clear();
+
             foreach (var ns in Datapack.Namespaces)
             {
                 FileExplorerView.Render(ns);
@@ -82,11 +86,36 @@ namespace MinecraftDatapackEditor
         {
             try
             {
+                if (e.NewValue == null)
+                    return;
+
                 var tvi = (TreeViewItem)e.NewValue;
 
                 ValueTxt.Text = tvi.Tag.ToString();
             }
             catch (Exception) { }
+        }
+
+        private void DeleteSelectionBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var tvi = (TreeViewItem)FileExplorerView.SelectedItem;
+            var obj = tvi.Tag;
+
+            if (obj is DistinctedList<IRenderDistinctable<string>, string>)
+            {
+                var list = (DistinctedList<IRenderDistinctable<string>, string>)obj;
+                var t = list.OriginType;
+
+                var others = new List<IRenderDistinctable<string>>(list.Origin);
+                others.RemoveWhere(x => list.Any(y => list.KeySelector.Invoke(x) == list.KeySelector.Invoke(y)));
+
+                MessageBox.Show($"Distincted List. {list.Count()}/{list.Origin.Count()} (subset of {others.Count()}) of type {t.Name}");
+
+                list.Origin.RemoveWhere(x => list.Any(y => list.KeySelector.Invoke(x) == list.KeySelector.Invoke(y)));
+                RefreshView();
+            }
+            else
+                MessageBox.Show(obj.ToString());
         }
     }
 }

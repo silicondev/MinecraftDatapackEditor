@@ -43,7 +43,12 @@ namespace MinecraftDatapackEditor
 
             var type = obj.GetType();
 
-            if (type.IsEnumerable() && !Base.ValueTypes.Contains(type))
+            if (type.CheckInterface<IRenderDivert>())
+            {
+                var div = (IRenderDivert)obj;
+                initialNode.Tag = div.Data;
+            }
+            else if (type.IsEnumerable() && !Base.ValueTypes.Contains(type))
             {
                 var elType = type.GetArrayType();
 
@@ -52,9 +57,16 @@ namespace MinecraftDatapackEditor
                 if (arr == null)
                     return;
 
-                if (elType.CheckInterface<IRenderDistinctable<string>>())
-                    arr = arr.Cast<IRenderDistinctable<string>>().ToArray().GetDistinct<string, IRenderDistinctable<string>>().Select(x => new RenderableList<object>(x.Title, ((List<IRenderDistinctable<string>>)x).Cast<object>().ToList())).ToArray();
+                //if (elType.CheckInterface<IRenderDistinctable<string>>())
+                //    arr = arr.Cast<IRenderDistinctable<string>>().ToArray().GetDistinct().Select(x => new RenderableList<object>(x.Title, ((List<IRenderDistinctable<string>>)x).Cast<object>().ToList())).ToArray();
 
+                if (elType.CheckInterface<IRenderDistinctable<string>>())
+                {
+                    var renderableList = arr.Cast<IRenderDistinctable<string>>().ToArray();
+                    var distinctedList = renderableList.GetDistinct();
+                    arr = distinctedList.ToArray();
+                }
+                
                 initialNode.Header += $"[{arr.Length}]";
 
                 var isRenderable = elType.IsRenderableType();
@@ -126,16 +138,16 @@ namespace MinecraftDatapackEditor
             return pa[0].ParameterType;
         }
 
-        public static List<RenderableList<TValue>> GetDistinct<TKey, TValue>(this IRenderDistinctable<TKey>[] list) where TValue : IRenderDistinctable<TKey>
+        public static List<DistinctedList<IRenderDistinctable<string>, string>> GetDistinct<TValue>(this TValue[] list) where TValue : IRenderDistinctable<string>
         {
-            var dict = new Dictionary<TKey, RenderableList<TValue>>();
+            var dict = new Dictionary<string, DistinctedList<IRenderDistinctable<string>, string>>();
 
             foreach (TValue item in list)
             {
                 if (item == null)
                     continue;
 
-                TKey key = item.GetDistinct();
+                string key = item.Title;
 
                 if (key == null)
                     continue;
@@ -143,7 +155,7 @@ namespace MinecraftDatapackEditor
                 if (dict.ContainsKey(key))
                     dict[key].Add(item);
                 else
-                    dict.Add(key, new RenderableList<TValue>(item.Title) { item });
+                    dict.Add(key, new DistinctedList<IRenderDistinctable<string>, string>(item.Title, list.Cast<IRenderDistinctable<string>>().ToList(), x => x.Title) { item });
             }
 
             return dict.Values.ToList();
@@ -163,6 +175,13 @@ namespace MinecraftDatapackEditor
             var arr = new object[coll.Count];
             coll.CopyTo(arr, 0);
             return arr;
+        }
+
+        public static void RemoveWhere<T>(this IList<T> list, Func<T, bool> predicate)
+        {
+            var removeList = new List<T>(list.Where(predicate));
+            foreach (var item in removeList)
+                list.Remove(item);
         }
     }
 }

@@ -16,6 +16,8 @@ namespace MinecraftDatapackEditor.Data
 
         [JsonIgnore]
         public string Title => Name;
+        [JsonIgnore]
+        public Type OriginType => typeof(Namespace);
 
         public Namespace(string name)
         {

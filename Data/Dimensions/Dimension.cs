@@ -17,5 +17,7 @@ namespace MinecraftDatapackEditor.Data.Dimensions
         public Generator generator { get; set; }
         [JsonIgnore]
         public string Title => Name;
+        [JsonIgnore]
+        public Type OriginType => typeof(Dimension);
     }
 }

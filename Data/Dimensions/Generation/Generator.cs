@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MinecraftDatapackEditor.Interfaces;
+using Newtonsoft.Json;
 
 namespace MinecraftDatapackEditor.Data.Dimensions.Generation
 {
@@ -13,6 +14,9 @@ namespace MinecraftDatapackEditor.Data.Dimensions.Generation
         public string settings { get; set; }
         public BiomeSource biome_source { get; set; }
 
+        [JsonIgnore]
         public string Title => "generator";
+        [JsonIgnore]
+        public Type OriginType => typeof(Generator);
     }
 }

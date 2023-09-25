@@ -1,5 +1,6 @@
 ﻿using MinecraftDatapackEditor.Converters;
 using MinecraftDatapackEditor.Interfaces;
+using MinecraftDatapackEditor.Structs;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,16 +12,22 @@ namespace MinecraftDatapackEditor.Data.Dimensions.Generation
 {
     public class BiomeParameters : IRenderable
     {
-        public double[] temperature { get; set; }
-        public double[] humidity { get; set; }
-        public double[] continentalness { get; set; }
-        public double[] weirdness { get; set; }
-        [JsonConverter(typeof(SingleArrayConverter<double>))]
-        public double[] depth { get; set; }
-        [JsonConverter(typeof(SingleArrayConverter<double>))]
-        public double[] offset { get; set; }
+        [JsonConverter(typeof(Vector2DConverter))]
+        public Vector2D temperature { get; set; }
+        [JsonConverter(typeof(Vector2DConverter))]
+        public Vector2D humidity { get; set; }
+        [JsonConverter(typeof(Vector2DConverter))]
+        public Vector2D continentalness { get; set; }
+        [JsonConverter(typeof(Vector2DConverter))]
+        public Vector2D weirdness { get; set; }
+        [JsonConverter(typeof(Vector2DConverter))]
+        public Vector2D depth { get; set; }
+        [JsonConverter(typeof(Vector2DConverter))]
+        public Vector2D offset { get; set; }
 
         [JsonIgnore]
         public string Title => "parameters";
+        [JsonIgnore]
+        public Type OriginType => typeof(BiomeParameters);
     }
 }

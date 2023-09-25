@@ -53,7 +53,25 @@
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <Border BorderBrush="Black">
-                    <TreeView x:Name="FileExplorerView" SelectedItemChanged="FileExplorerView_SelectedItemChanged"/>
+                    <Grid x:Name="SidebarGrid">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="35"/>
+                                <ColumnDefinition Width="3"/>
+                                <ColumnDefinition Width="35"/>
+                                <ColumnDefinition Width="3"/>
+                                <ColumnDefinition Width="35"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="DeleteSelectionBtn" Grid.Column="5" Click="DeleteSelectionBtn_Click">🗑️</Button>
+                        </Grid>
+                        <TreeView x:Name="FileExplorerView" Grid.Row="1" SelectedItemChanged="FileExplorerView_SelectedItemChanged"/>
+                    </Grid>
                 </Border>
             </Grid>
             <Grid Grid.Column="1">

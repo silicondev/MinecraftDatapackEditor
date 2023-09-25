@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace MinecraftDatapackEditor.Interfaces
 {
-    public interface IRenderable
+    public interface IRenderDivert
     {
-        public string Title { get; }
-        public Type OriginType { get; }
+        public string Data { get; }
     }
 }

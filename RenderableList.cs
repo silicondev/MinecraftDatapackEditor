@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Documents.DocumentStructures;
+using MinecraftDatapackEditor.Data.Dimensions;
 using MinecraftDatapackEditor.Interfaces;
 
 namespace MinecraftDatapackEditor
@@ -11,6 +12,7 @@ namespace MinecraftDatapackEditor
     public class RenderableList<T> : List<T>, IRenderable
     {
         public string Title { get; }
+        public virtual Type OriginType => typeof(T);
         public RenderableList(string title) : base()
         {
             Title = title;
