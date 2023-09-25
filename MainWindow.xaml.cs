@@ -4,6 +4,7 @@ using MinecraftDatapackEditor.Data.Dimensions.Generation;
 using MinecraftDatapackEditor.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -36,6 +37,8 @@ namespace MinecraftDatapackEditor
         public MainWindow()
         {
             InitializeComponent();
+            InfoDataGrid.Visibility = Visibility.Hidden;
+            SidebarGrid.Visibility = Visibility.Hidden;
         }
 
         private void DatapackFolderSelectBtn_Click(object sender, RoutedEventArgs e)
@@ -65,7 +68,13 @@ namespace MinecraftDatapackEditor
             }
 
             ValidDatapack = Datapack != null && !string.IsNullOrEmpty(Datapack.Name) && Datapack.Pack != null;
-            RefreshView();
+            if (ValidDatapack)
+            {
+                RefreshView();
+                SidebarGrid.Visibility = Visibility.Visible;
+                InfoDataGrid.Visibility = Visibility.Hidden;
+            }
+            
             LoadBtn.Content = "LOAD";
         }
 
@@ -82,18 +91,65 @@ namespace MinecraftDatapackEditor
             }
         }
 
-        private void FileExplorerView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private async void FileExplorerView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
+            var newVal = e.NewValue;
+            DataView? view = null;
+            object? obj = null;
+
             try
             {
-                if (e.NewValue == null)
+                if (newVal == null)
                     return;
 
-                var tvi = (TreeViewItem)e.NewValue;
+                var tvi = (TreeViewItem)newVal;
+                obj = tvi.Tag;
 
-                ValueTxt.Text = tvi.Tag.ToString();
+
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+                return;
+            }
+
+            var type = obj.GetType();
+
+            if (type.IsEnumerable() && (type.GetArrayType()?.Inherits<Tableable>() ?? false))
+            {
+                var elType = type.GetArrayType();
+                var arr = obj.GetArray();
+                ValueTxt.Text = "Loading...";
+
+                await Task.Run(() =>
+                {
+                    DataTable? tb = null;
+                    foreach (Tableable item in arr)
+                    {
+                        tb = item.GetRow(tb);
+                    }
+
+                    //var newView = new DataView(tb);
+
+                    //tb = newView.ToTable(true, "Biome Id");
+
+                    view = tb.DefaultView;
+                    //view = new DataView(tb);
+                });
+
+                ValueTxt.Text = $"{elType.Name}[{arr.Length}]";
+            }
+
+            if (view != null)
+            {
+                InfoDataGrid.DataContext = view;
+                InfoDataGrid.Visibility = Visibility.Visible;
+            }
+            else if (obj != null)
+            {
+                ValueTxt.Text = obj.ToString();
+                InfoDataGrid.Visibility = Visibility.Hidden;
+            }
+            
         }
 
         private void DeleteSelectionBtn_Click(object sender, RoutedEventArgs e)
@@ -116,6 +172,12 @@ namespace MinecraftDatapackEditor
             }
             else
                 MessageBox.Show(obj.ToString());
+        }
+
+        private void InfoDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var row = (DataRowView)InfoDataGrid.SelectedItem;
+            ValueTxt.Text = row["Biome Id"].ToString();
         }
     }
 }

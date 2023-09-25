@@ -11,6 +11,17 @@ namespace MinecraftDatapackEditor.Structs
     {
         public double? X { get; set; }
         public double? Y { get; set; }
-        public string Data => $"{X}, {Y};";
+
+        public string Data => ToString();
+
+        public override string ToString()
+        {
+            var dbs = new List<double>();
+            if (X != null)
+                dbs.Add(X.Value);
+            if (Y != null)
+                dbs.Add(Y.Value);
+            return string.Join(", ", dbs.ToArray());
+        }
     }
 }

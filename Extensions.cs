@@ -52,34 +52,38 @@ namespace MinecraftDatapackEditor
             {
                 var elType = type.GetArrayType();
 
-                var arr = obj.GetArray();
-
-                if (arr == null)
-                    return;
-
-                //if (elType.CheckInterface<IRenderDistinctable<string>>())
-                //    arr = arr.Cast<IRenderDistinctable<string>>().ToArray().GetDistinct().Select(x => new RenderableList<object>(x.Title, ((List<IRenderDistinctable<string>>)x).Cast<object>().ToList())).ToArray();
-
-                if (elType.CheckInterface<IRenderDistinctable<string>>())
+                if (elType.Inherits<Tableable>())
                 {
-                    var renderableList = arr.Cast<IRenderDistinctable<string>>().ToArray();
-                    var distinctedList = renderableList.GetDistinct();
-                    arr = distinctedList.ToArray();
+                    initialNode.Header += " (Table)";
                 }
-                
-                initialNode.Header += $"[{arr.Length}]";
+                else
+                {
+                    var arr = obj.GetArray();
 
-                var isRenderable = elType.IsRenderableType();
+                    if (arr == null)
+                        return;
 
-                for (int i = 0; i < arr.Length; i++)
-                    if (arr.GetValue(i) != null)
-                        if (isRenderable)
-                        {
-                            var renderable = (IRenderable)arr.GetValue(i);
-                            initialNode.Render(arr.GetValue(i), $"[{i}] {renderable.Title}");
-                        }
-                        else
-                            initialNode.Render(arr.GetValue(i), $"[{i}]");
+                    if (elType.CheckInterface<IRenderDistinctable<string>>())
+                    {
+                        var renderableList = arr.Cast<IRenderDistinctable<string>>().ToArray();
+                        var distinctedList = renderableList.GetDistinct();
+                        arr = distinctedList.ToArray();
+                    }
+
+                    initialNode.Header += $"[{arr.Length}]";
+
+                    var isRenderable = elType.IsRenderableType();
+
+                    for (int i = 0; i < arr.Length; i++)
+                        if (arr.GetValue(i) != null)
+                            if (isRenderable)
+                            {
+                                var renderable = (IRenderable)arr.GetValue(i);
+                                initialNode.Render(arr.GetValue(i), $"[{i}] {renderable.Title}");
+                            }
+                            else
+                                initialNode.Render(arr.GetValue(i), $"[{i}]");
+                }
             }
             // Is a value type that should be displayed as is
             else if (type.IsReadableType())
@@ -110,6 +114,7 @@ namespace MinecraftDatapackEditor
 
         public static bool CheckAttribute<T>(this MemberInfo mi) where T : Attribute => Attribute.GetCustomAttribute(mi, typeof(T)) != null;
         public static bool CheckInterface<T>(this Type mi) => mi.GetInterfaces().Contains(typeof(T));
+        public static bool Inherits<T>(this Type mi) => typeof(T).IsAssignableFrom(mi);
 
         public static bool IsReadableType(this Type t) => t.IsValueType || Base.ValueTypes.Contains(t);
         public static bool IsRenderableType(this Type t) => t.IsArray ? t.GetElementType().CheckInterface<IRenderable>() : t.CheckInterface<IRenderable>();

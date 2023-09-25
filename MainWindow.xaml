@@ -76,7 +76,12 @@
             </Grid>
             <Grid Grid.Column="1">
                 <Border BorderBrush="Black">
-                    <TextBlock x:Name="ValueTxt"/>
+                    <StackPanel>
+                        <TextBlock x:Name="ValueTxt"/>
+                        <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
+                            <DataGrid x:Name="InfoDataGrid" AutoGenerateColumns="True" ItemsSource="{Binding}" SelectionChanged="InfoDataGrid_SelectionChanged"/>
+                        </ScrollViewer>
+                    </StackPanel>
                 </Border>
             </Grid>
         </Grid>
